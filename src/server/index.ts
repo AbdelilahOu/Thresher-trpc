@@ -1,7 +1,7 @@
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { inferAsyncReturnType } from "@trpc/server";
 import express, { Application } from "express";
-import { appRouter, type AppRouter } from "./routes/trpcRoute";
+import { appRouter, type AppRouter } from "./routes/index";
 import bodyParser from "body-parser";
 const app: Application = express();
 
