@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../src/server/database/db.sqlite"
+}
+
+model Product {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique()
+  description    String?
+  price          Float
+  stock          Int
+  StockMouvement StockMouvement[]
+  InvoiceItem    InvoiceItem[]
+  CommandItem    CommandItem[]
+}
+
+model Client {
+  id       Int       @id @default(autoincrement())
+  name     String
+  phone    String?
+  email    String?
+  addresse String?
+  Command  Command[]
+}
+
+model Vendor {
+  id       Int       @id @default(autoincrement())
+  name     String
+  phone    String?
+  email    String?
+  addresse String?
+  Invoice  Invoice[]
+}
+
+model Invoice {
+  id           Int           @id @default(autoincrement())
+  Vendor       Vendor        @relation(fields: [vendorId], references: [id])
+  total        Float
+  createdAt    DateTime      @default(now())
+  vendorId     Int
+  InvoiceItems InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        Int            @id @default(autoincrement())
+  productId Int
+  invoiceId Int
+  Product   Product        @relation(fields: [productId], references: [id])
+  Invoice   Invoice        @relation(fields: [invoiceId], references: [id])
+  quantity  Int
+  stockId   Int            @unique
+  stock     StockMouvement @relation(fields: [stockId], references: [id])
+}
+
+model StockMouvement {
+  id          Int          @id @default(autoincrement())
+  date        DateTime     @default(now())
+  model       String
+  quantity    Int
+  CommandItem CommandItem?
+  InvoiceItem InvoiceItem?
+  Product     Product      @relation(fields: [productId], references: [id])
+  productId   Int
+}
+
+model Command {
+  id          Int           @id @default(autoincrement())
+  Client      Client        @relation(fields: [clientId], references: [id])
+  status      String
+  createdAt   DateTime      @default(now())
+  clientId    Int
+  CommandItem CommandItem[]
+}
+
+model CommandItem {
+  id        Int            @id @default(autoincrement())
+  productId Int
+  commandId Int
+  Product   Product        @relation(fields: [productId], references: [id])
+  Command   Command        @relation(fields: [commandId], references: [id])
+  quantity  Int
+  stockId   Int            @unique
+  Stock     StockMouvement @relation(fields: [stockId], references: [id])
+}
