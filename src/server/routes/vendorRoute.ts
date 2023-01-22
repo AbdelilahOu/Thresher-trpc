@@ -1,18 +1,18 @@
 import {
-  createClient,
-  getAllClients,
-  getClient,
-  updateClient,
-} from "../database/repository/clientRepo";
+  createVendor,
+  getAllVendors,
+  getVendor,
+  updateVendor,
+} from "../database/repository/VendorRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const clientRoute = router({
+export const vendorRoute = router({
   getAll: procedure.query(() => {
-    return getAllClients();
+    return getAllVendors();
   }),
   findById: procedure.input(z.number()).query(({ input }) => {
-    return getClient(input);
+    return getVendor(input);
   }),
   createOne: procedure
     .input(
@@ -27,8 +27,8 @@ export const clientRoute = router({
         addresse: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
-      return createClient(input);
+    .mutation(async ({ input }) => {
+      return await createVendor(input);
     }),
   updateOne: procedure
     .input(
@@ -40,9 +40,9 @@ export const clientRoute = router({
         addresse: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       const { id, name, email, phone, addresse } = input;
-      return updateClient({
+      return await updateVendor({
         id: id,
         data: {
           name,
@@ -54,7 +54,7 @@ export const clientRoute = router({
     }),
 });
 
-// export interface newClientT {
+// export interface newVendorT {
 //   name: string;
 //   email?: string;
 //   phone?: string;

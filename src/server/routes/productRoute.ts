@@ -1,18 +1,18 @@
 import {
-  createClient,
-  getAllClients,
-  getClient,
-  updateClient,
-} from "../database/repository/clientRepo";
+  createProduct,
+  getAllProducts,
+  getProduct,
+  updateProduct,
+} from "../database/repository/productRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const clientRoute = router({
+export const ProductRoute = router({
   getAll: procedure.query(() => {
-    return getAllClients();
+    return getAllProducts();
   }),
   findById: procedure.input(z.number()).query(({ input }) => {
-    return getClient(input);
+    return getProduct(input);
   }),
   createOne: procedure
     .input(
@@ -22,39 +22,39 @@ export const clientRoute = router({
             required_error: "name is required",
           })
           .min(1),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
+        price: z.number(),
+        stock: z.number(),
+        description: z.string().optional(),
       })
     )
     .mutation(({ input }) => {
-      return createClient(input);
+      return createProduct(input);
     }),
   updateOne: procedure
     .input(
       z.object({
         id: z.number(),
         name: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        description: z.string().optional(),
       })
     )
     .mutation(({ input }) => {
-      const { id, name, email, phone, addresse } = input;
-      return updateClient({
+      const { id, name, price, stock, description } = input;
+      return updateProduct({
         id: id,
         data: {
           name,
-          email,
-          phone,
-          addresse,
+          price,
+          stock,
+          description,
         },
       });
     }),
 });
 
-// export interface newClientT {
+// export interface newProductT {
 //   name: string;
 //   email?: string;
 //   phone?: string;

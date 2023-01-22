@@ -1,62 +1,65 @@
 import {
-  createClient,
-  getAllClients,
-  getClient,
-  updateClient,
-} from "../database/repository/clientRepo";
+  createCommand,
+  createCommandItem,
+  getAllCommands,
+  getCommand,
+  updateCommand,
+} from "../database/repository/commandRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const clientRoute = router({
+export const CommandRoute = router({
   getAll: procedure.query(() => {
-    return getAllClients();
+    return getAllCommands();
   }),
   findById: procedure.input(z.number()).query(({ input }) => {
-    return getClient(input);
+    return getCommand(input);
   }),
   createOne: procedure
     .input(
       z.object({
-        name: z
-          .string({
-            required_error: "name is required",
+        status: z.string(),
+        clientId: z.number(),
+        commandItems: z.array(
+          z.object({
+            productId: z.number(),
+            quantity: z.number(),
           })
-          .min(1),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
+        ),
       })
     )
-    .mutation(({ input }) => {
-      return createClient(input);
-    }),
-  updateOne: procedure
-    .input(
-      z.object({
-        id: z.number(),
-        name: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
-      })
-    )
-    .mutation(({ input }) => {
-      const { id, name, email, phone, addresse } = input;
-      return updateClient({
-        id: id,
-        data: {
-          name,
-          email,
-          phone,
-          addresse,
-        },
+    .mutation(async ({ input }) => {
+      const { status, clientId, commandItems } = input;
+      const command = await createCommand({ status, clientId });
+      let commandItemsArray = commandItems.map(async (item) => {
+        return await createCommandItem({ commandId: command.id, ...item });
       });
-    }),
-});
 
-// export interface newClientT {
-//   name: string;
-//   email?: string;
-//   phone?: string;
-//   addresse?: string;
-// }
+      return {
+        ...command,
+        commandItems: commandItemsArray,
+      };
+    }),
+  // updateOne: procedure
+  //   .input(
+  //     z.object({
+  //       id: z.number(),
+  //       name: z.string().optional(),
+  //       email: z.string().optional(),
+  //       phone: z.string().optional(),
+  //       addresse: z.string().optional(),
+  //     })
+  //   )
+  //   .mutation(({ input }) => {
+  //     const { id, name, email, phone, addresse } = input;
+  //     return updateCommand({
+  //       id: id,
+  //       data: {
+  //         name,
+  //         email,
+  //         phone,
+  //         addresse,
+  //       },
+  //     });
+  //   }),
+});
