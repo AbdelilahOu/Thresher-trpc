@@ -40,26 +40,4 @@ export const CommandRoute = router({
         commandItems: commandItemsArray,
       };
     }),
-  // updateOne: procedure
-  //   .input(
-  //     z.object({
-  //       id: z.number(),
-  //       name: z.string().optional(),
-  //       email: z.string().optional(),
-  //       phone: z.string().optional(),
-  //       addresse: z.string().optional(),
-  //     })
-  //   )
-  //   .mutation(({ input }) => {
-  //     const { id, name, email, phone, addresse } = input;
-  //     return updateCommand({
-  //       id: id,
-  //       data: {
-  //         name,
-  //         email,
-  //         phone,
-  //         addresse,
-  //       },
-  //     });
-  //   }),
 });

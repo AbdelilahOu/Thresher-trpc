@@ -53,10 +53,3 @@ export const ProductRoute = router({
       });
     }),
 });
-
-// export interface newProductT {
-//   name: string;
-//   email?: string;
-//   phone?: string;
-//   addresse?: string;
-// }

@@ -53,10 +53,3 @@ export const vendorRoute = router({
       });
     }),
 });
-
-// export interface newVendorT {
-//   name: string;
-//   email?: string;
-//   phone?: string;
-//   addresse?: string;
-// }
