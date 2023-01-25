@@ -1,26 +1,25 @@
 import {
-  createCommand,
-  createCommandItem,
-  getAllCommands,
-  getCommand,
-  updateCommand,
-} from "../database/repository/commandRepo";
+  createInvoice,
+  getAllInvoices,
+  getInvoice,
+  updateInvoice,
+} from "../database/repository/invoiceRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const CommandRoute = router({
+export const invoiceRoute = router({
   getAll: procedure.query(() => {
-    return getAllCommands();
+    return getAllInvoices();
   }),
   findById: procedure.input(z.number()).query(({ input }) => {
-    return getCommand(input);
+    return getInvoice(input);
   }),
   createOne: procedure
     .input(
       z.object({
         status: z.string(),
         clientId: z.number(),
-        commandItems: z.array(
+        InvoiceItems: z.array(
           z.object({
             productId: z.number(),
             quantity: z.number(),
@@ -28,16 +27,5 @@ export const CommandRoute = router({
         ),
       })
     )
-    .mutation(async ({ input }) => {
-      const { status, clientId, commandItems } = input;
-      const command = await createCommand({ status, clientId });
-      let commandItemsArray = commandItems.map(async (item) => {
-        return await createCommandItem({ commandId: command.id, ...item });
-      });
-
-      return {
-        ...command,
-        commandItems: commandItemsArray,
-      };
-    }),
+    .mutation(async ({ input }) => {}),
 });

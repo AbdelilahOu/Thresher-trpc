@@ -8,7 +8,7 @@ import {
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const CommandRoute = router({
+export const commandRoute = router({
   getAll: procedure.query(() => {
     return getAllCommands();
   }),

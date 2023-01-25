@@ -7,7 +7,7 @@ import {
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const clientRoute = router({
+export const stockRoute = router({
   getAll: procedure.query(() => {
     return getAllClients();
   }),

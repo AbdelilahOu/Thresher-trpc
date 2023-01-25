@@ -7,7 +7,7 @@ import {
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 
-export const ProductRoute = router({
+export const productRoute = router({
   getAll: procedure.query(() => {
     return getAllProducts();
   }),
