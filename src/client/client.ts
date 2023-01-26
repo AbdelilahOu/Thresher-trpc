@@ -11,6 +11,7 @@ const trpc = createTRPCProxyClient<AppRouter>({
 
 const main = () => {
   const allClients = trpc.client.getAll.query();
+  const allVendors = trpc.vendor.getAll.query();
 };
 
 main();
