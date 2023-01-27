@@ -1,55 +1,23 @@
-import {
-  createClient,
-  getAllClients,
-  getClient,
-  updateClient,
-} from "../database/repository/clientRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
+import {
+  createStockMouvement,
+  getStockMouvement,
+} from "../database/repository/stockRepo";
 
 export const stockRoute = router({
-  getAll: procedure.query(() => {
-    return getAllClients();
-  }),
   findById: procedure.input(z.number()).query(({ input }) => {
-    return getClient(input);
+    return getStockMouvement(input);
   }),
   createOne: procedure
     .input(
       z.object({
-        name: z
-          .string({
-            required_error: "name is required",
-          })
-          .min(1),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
+        quantity: z.number(),
+        model: z.string(),
+        product: z.number(),
       })
     )
     .mutation(({ input }) => {
-      return createClient(input);
-    }),
-  updateOne: procedure
-    .input(
-      z.object({
-        id: z.number(),
-        name: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
-      })
-    )
-    .mutation(({ input }) => {
-      const { id, name, email, phone, addresse } = input;
-      return updateClient({
-        id: id,
-        data: {
-          name,
-          email,
-          phone,
-          addresse,
-        },
-      });
+      return createStockMouvement(input);
     }),
 });

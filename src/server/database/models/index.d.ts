@@ -45,7 +45,7 @@ export interface stockMvmT extends newStockMvmT {
 
 export interface newStockMvmT {
   product: number;
-  type: string;
+  model: string;
   quantity: number;
 }
 

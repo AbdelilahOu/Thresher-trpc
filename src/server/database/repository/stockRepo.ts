@@ -5,7 +5,7 @@ export const createStockMouvement = (data: newStockMvmT) => {
   return prisma.stockMouvement.create({
     data: {
       quantity: data.quantity,
-      model: data.type,
+      model: data.model,
       Product: {
         connect: {
           id: data.product,
