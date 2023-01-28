@@ -2,7 +2,8 @@ import { prisma } from "..";
 import {
   newCommandItemT,
   newCommandT,
-  updateCommmandT,
+  updateCommandItemT,
+  updateCommandT,
   updateData,
 } from "../models";
 
@@ -13,7 +14,7 @@ export const getCommand = (id: number) => {
 export const getAllCommands = () => {
   return prisma.command.findMany({
     include: {
-      CommandItem: true,
+      commandItems: true,
     },
   });
 };
@@ -22,7 +23,7 @@ export const createCommand = (data: newCommandT) => {
   return prisma.command.create({
     data: {
       status: data.status,
-      Client: {
+      client: {
         connect: {
           id: data.clientId,
         },
@@ -34,20 +35,20 @@ export const createCommand = (data: newCommandT) => {
 export const createCommandItem = (data: newCommandItemT) => {
   return prisma.commandItem.create({
     data: {
-      Product: {
+      product: {
         connect: {
           id: data.productId,
         },
       },
-      Command: {
+      command: {
         connect: {
           id: data.commandId,
         },
       },
       quantity: data.quantity,
-      Stock: {
+      stock: {
         create: {
-          Product: {
+          product: {
             connect: {
               id: data.productId,
             },
@@ -60,14 +61,59 @@ export const createCommandItem = (data: newCommandItemT) => {
   });
 };
 
-export const updateCommand = (command: updateData<updateCommmandT>) => {
+export const updateCommandItem = (data: updateCommandItemT) => {
+  return prisma.commandItem.upsert({
+    where: {
+      id: data.id ? data.id : 0,
+    },
+    update: {
+      quantity: data.quantity,
+      product: {
+        connect: {
+          id: data.productId,
+        },
+      },
+      stock: {
+        update: {
+          quantity: data.quantity,
+        },
+      },
+    },
+    create: {
+      product: {
+        connect: {
+          id: data.productId,
+        },
+      },
+      command: {
+        connect: {
+          id: data.commandId,
+        },
+      },
+      quantity: data.quantity,
+      stock: {
+        create: {
+          product: {
+            connect: {
+              id: data.productId,
+            },
+          },
+          quantity: -data.quantity,
+          model: "OUT",
+        },
+      },
+    },
+  });
+};
+
+export const updateCommand = (command: updateData<updateCommandT>) => {
   return prisma.command.update({
     where: {
       id: command.id,
     },
     data: {
       status: command.data.status,
-      Client: command.data.clientId
+      client: command.data.clientId
         ? { connect: { id: command.data.clientId } }
         : undefined,
     },

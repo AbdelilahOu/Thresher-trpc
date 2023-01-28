@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import { AppRouter } from "../server/routes/index";
+import { AppRouter } from "../src/server/routes/index";
 
 const trpc = createTRPCProxyClient<AppRouter>({
   links: [
@@ -9,9 +9,7 @@ const trpc = createTRPCProxyClient<AppRouter>({
   ],
 });
 
-const main = () => {
-  const allClients = trpc.client.getAll.query();
-  const allVendors = trpc.vendor.getAll.query();
-};
-
-main();
+(async () => {
+  const allClients = await trpc.client.getAll.query();
+  const allVendors = await trpc.vendor.getAll.query();
+})();

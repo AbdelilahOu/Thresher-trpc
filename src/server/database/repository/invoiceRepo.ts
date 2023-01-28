@@ -5,7 +5,7 @@ export const createInvoice = (data: newInvoiceT) => {
   return prisma.invoice.create({
     data: {
       total: data.total,
-      Vendor: { connect: { id: data.vendorId } },
+      vendor: { connect: { id: data.vendorId } },
     },
   });
 };
@@ -15,7 +15,7 @@ export const updateInvoice = (invoice: updateData<updateInvoiceT>) => {
     where: { id: invoice.id },
     data: {
       total: invoice.data.total ? invoice.data.total : undefined,
-      Vendor: invoice.data.vendorId
+      vendor: invoice.data.vendorId
         ? { connect: { id: invoice.data.vendorId } }
         : undefined,
     },

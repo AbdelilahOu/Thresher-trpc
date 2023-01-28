@@ -14,7 +14,7 @@ export const stockRoute = router({
       z.object({
         quantity: z.number(),
         model: z.string(),
-        product: z.number(),
+        productId: z.number(),
       })
     )
     .mutation(({ input }) => {

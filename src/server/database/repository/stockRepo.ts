@@ -6,9 +6,9 @@ export const createStockMouvement = (data: newStockMvmT) => {
     data: {
       quantity: data.quantity,
       model: data.model,
-      Product: {
+      product: {
         connect: {
-          id: data.product,
+          id: data.productId,
         },
       },
     },
@@ -19,7 +19,7 @@ export const getStockMouvement = (id: number) => {
   return prisma.stockMouvement.findUnique({
     where: { id },
     select: {
-      CommandItem: {
+      commandItem: {
         select: {
           quantity: true,
         },
