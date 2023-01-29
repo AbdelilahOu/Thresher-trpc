@@ -1,18 +1,17 @@
-import {
-  createClient,
-  getAllClients,
-  getClient,
-  updateClient,
-} from "../database/repository/clientRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
+import { prisma } from "../database/index";
 
 export const clientRoute = router({
-  getAll: procedure.query(() => {
-    return getAllClients();
+  getAll: procedure.query(async () => {
+    return await prisma.client.findMany();
   }),
-  findById: procedure.input(z.number()).query(({ input }) => {
-    return getClient(input);
+  findById: procedure.input(z.number()).query(async ({ input }) => {
+    return await prisma.client.findUnique({
+      where: {
+        id: input,
+      },
+    });
   }),
   createOne: procedure
     .input(
@@ -27,28 +26,32 @@ export const clientRoute = router({
         addresse: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
-      return createClient(input);
+    .mutation(async ({ input }) => {
+      return await prisma.client.create({
+        data: input,
+      });
     }),
   updateOne: procedure
     .input(
       z.object({
         id: z.number(),
-        name: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        addresse: z.string().optional(),
+        name: z.string().nullish(),
+        email: z.string().nullish(),
+        phone: z.string().nullish(),
+        addresse: z.string().nullish(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       const { id, name, email, phone, addresse } = input;
-      return updateClient({
-        id: id,
+      return await prisma.client.update({
+        where: {
+          id,
+        },
         data: {
-          name,
-          email,
-          phone,
-          addresse,
+          name: name ? name : undefined,
+          email: email ? email : undefined,
+          phone: phone ? phone : undefined,
+          addresse: addresse ? addresse : undefined,
         },
       });
     }),
