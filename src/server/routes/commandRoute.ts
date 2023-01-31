@@ -1,21 +1,36 @@
-import {
-  createCommand,
-  createCommandItem,
-  getAllCommands,
-  getCommand,
-  updateCommand,
-  updateCommandItem,
-} from "../database/repository/commandRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 import { CommandItem, Invoice } from "@prisma/client";
+import { prisma } from "../database/index";
 
 export const commandRoute = router({
   getAll: procedure.query(() => {
-    return getAllCommands();
+    return prisma.command.findMany({
+      include: {
+        commandItems: true,
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
   }),
   findById: procedure.input(z.number()).query(({ input }) => {
-    return getCommand(input);
+    return prisma.command.findUnique({
+      where: { id: input },
+      include: {
+        commandItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                price: true,
+              },
+            },
+          },
+        },
+        client: true,
+      },
+    });
   }),
   createOne: procedure
     .input(
@@ -32,12 +47,44 @@ export const commandRoute = router({
     )
     .mutation(async ({ input }) => {
       const { status, clientId, commandItems } = input;
-      const command = await createCommand({ status, clientId });
+      const command = await prisma.command.create({
+        data: {
+          status: status,
+          client: {
+            connect: {
+              id: clientId,
+            },
+          },
+        },
+      });
+
       let commandItemsArray: CommandItem[] = [];
       for await (const item of commandItems) {
-        const newItem = await createCommandItem({
-          commandId: command.id,
-          ...item,
+        const newItem = await prisma.commandItem.create({
+          data: {
+            product: {
+              connect: {
+                id: item.productId,
+              },
+            },
+            command: {
+              connect: {
+                id: command.id,
+              },
+            },
+            quantity: item.quantity,
+            stock: {
+              create: {
+                product: {
+                  connect: {
+                    id: item.productId,
+                  },
+                },
+                quantity: -item.quantity,
+                model: "OUT",
+              },
+            },
+          },
         });
         commandItemsArray.push(newItem);
       }
@@ -65,20 +112,65 @@ export const commandRoute = router({
     .mutation(async ({ input }) => {
       const { status, commandItems, id } = input;
 
-      const updatedCommand = await updateCommand({
-        id: Number(id),
+      const updatedCommand = await prisma.command.update({
+        where: {
+          id,
+        },
         data: {
-          status,
+          status: status,
         },
       });
 
       let updatedCommandItem: any[] = [];
       for await (const item of commandItems) {
-        const updatedItem = await updateCommandItem({
-          ...item,
-          commandId: updatedCommand.id,
+        const updatedItem = await prisma.commandItem.upsert({
+          where: {
+            id: item.id ? item.id : 0,
+          },
+          update: {
+            quantity: item.quantity,
+            product: {
+              connect: {
+                id: item.productId,
+              },
+            },
+            stock: {
+              update: {
+                quantity: -item.quantity,
+              },
+            },
+          },
+          create: {
+            product: {
+              connect: {
+                id: item.productId,
+              },
+            },
+            command: {
+              connect: {
+                id: item.commandId,
+              },
+            },
+            quantity: item.quantity,
+            stock: {
+              create: {
+                product: {
+                  connect: {
+                    id: item.productId,
+                  },
+                },
+                quantity: -item.quantity,
+                model: "OUT",
+              },
+            },
+          },
         });
         updatedCommandItem.push(updatedItem);
       }
+
+      return {
+        ...updatedCommand,
+        commandItems: updatedCommandItem,
+      };
     }),
 });
