@@ -1,18 +1,17 @@
-import {
-  createProduct,
-  getAllProducts,
-  getProduct,
-  updateProduct,
-} from "../database/repository/productRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
+import { prisma } from "../database/index";
 
 export const productRoute = router({
-  getAll: procedure.query(() => {
-    return getAllProducts();
+  getAll: procedure.query(async () => {
+    return await prisma.product.findMany({});
   }),
-  findById: procedure.input(z.number()).query(({ input }) => {
-    return getProduct(input);
+  findById: procedure.input(z.number()).query(async ({ input }) => {
+    return await prisma.product.findUnique({
+      where: {
+        id: input,
+      },
+    });
   }),
   createOne: procedure
     .input(
@@ -27,8 +26,22 @@ export const productRoute = router({
         description: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
-      return createProduct(input);
+    .mutation(async ({ input }) => {
+      const { name, price, stock, description } = input;
+
+      return await prisma.product.create({
+        data: {
+          name,
+          price,
+          description,
+          stockMouvements: {
+            create: {
+              quantity: stock,
+              model: "IN",
+            },
+          },
+        },
+      });
     }),
   updateOne: procedure
     .input(
@@ -40,14 +53,15 @@ export const productRoute = router({
         description: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       const { id, name, price, stock, description } = input;
-      return updateProduct({
-        id: id,
+      return await prisma.product.update({
+        where: {
+          id,
+        },
         data: {
           name,
           price,
-          stock,
           description,
         },
       });
