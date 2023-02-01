@@ -1,18 +1,17 @@
-import {
-  createVendor,
-  getAllVendors,
-  getVendor,
-  updateVendor,
-} from "../database/repository/VendorRepo";
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
+import { prisma } from "../database/index";
 
 export const vendorRoute = router({
-  getAll: procedure.query(() => {
-    return getAllVendors();
+  getAll: procedure.query(async () => {
+    return await prisma.vendor.findMany({});
   }),
-  findById: procedure.input(z.number()).query(({ input }) => {
-    return getVendor(input);
+  findById: procedure.input(z.number()).query(async ({ input }) => {
+    return await prisma.vendor.findUnique({
+      where: {
+        id: input,
+      },
+    });
   }),
   createOne: procedure
     .input(
@@ -28,7 +27,9 @@ export const vendorRoute = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await createVendor(input);
+      return await prisma.vendor.create({
+        data: input,
+      });
     }),
   updateOne: procedure
     .input(
@@ -42,8 +43,10 @@ export const vendorRoute = router({
     )
     .mutation(async ({ input }) => {
       const { id, name, email, phone, addresse } = input;
-      return await updateVendor({
-        id: id,
+      return await prisma.vendor.update({
+        where: {
+          id,
+        },
         data: {
           name,
           email,
