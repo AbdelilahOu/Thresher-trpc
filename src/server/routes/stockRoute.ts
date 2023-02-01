@@ -1,13 +1,10 @@
 import { router, procedure } from "../trpc/index";
 import { z } from "zod";
-import {
-  createStockMouvement,
-  getStockMouvement,
-} from "../database/repository/stockRepo";
+import { prisma } from "../database/index";
 
 export const stockRoute = router({
-  findById: procedure.input(z.number()).query(({ input }) => {
-    return getStockMouvement(input);
+  findById: procedure.query(async () => {
+    return prisma.stockMouvement.findMany({});
   }),
   createOne: procedure
     .input(
@@ -17,7 +14,9 @@ export const stockRoute = router({
         productId: z.number(),
       })
     )
-    .mutation(({ input }) => {
-      return createStockMouvement(input);
+    .mutation(async ({ input }) => {
+      return await prisma.stockMouvement.create({
+        data: input,
+      });
     }),
 });
