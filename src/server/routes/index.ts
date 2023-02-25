@@ -3,7 +3,7 @@ import { commandRoute } from "./commandRoute";
 import { invoiceRoute } from "./invoiceRoute";
 import { productRoute } from "./productRoute";
 import { clientRoute } from "./clientRoute";
-import { vendorRoute } from "./vendorRoute";
+import { sellerRoute } from "./sellerRoute";
 import { stockRoute } from "./stockRoute";
 
 export const appRouter = router({
@@ -11,7 +11,7 @@ export const appRouter = router({
   invoice: invoiceRoute,
   product: productRoute,
   client: clientRoute,
-  vendor: vendorRoute,
+  seller: sellerRoute,
   stock: stockRoute,
 });
 

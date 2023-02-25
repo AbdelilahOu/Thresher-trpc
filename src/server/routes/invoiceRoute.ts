@@ -29,7 +29,7 @@ export const invoiceRoute = router({
             },
           },
         },
-        vendor: {
+        seller: {
           select: {
             name: true,
           },
@@ -41,7 +41,7 @@ export const invoiceRoute = router({
     .input(
       z.object({
         total: z.number(),
-        vendorId: z.number(),
+        sellerId: z.number(),
         InvoiceItems: z.array(
           z.object({
             productId: z.number(),
@@ -55,7 +55,7 @@ export const invoiceRoute = router({
       const invoice = await prisma.invoice.create({
         data: {
           total: input.total ?? 0,
-          vendor: { connect: { id: input.vendorId } },
+          seller: { connect: { id: input.sellerId } },
         },
       });
       for await (const item of input.InvoiceItems) {

@@ -2,12 +2,12 @@ import { router, procedure } from "../trpc/index";
 import { z } from "zod";
 import { prisma } from "../database/index";
 
-export const vendorRoute = router({
+export const sellerRoute = router({
   getAll: procedure.query(async () => {
-    return await prisma.vendor.findMany({});
+    return await prisma.seller.findMany({});
   }),
   findById: procedure.input(z.number()).query(async ({ input }) => {
-    return await prisma.vendor.findUnique({
+    return await prisma.seller.findUnique({
       where: {
         id: input,
       },
@@ -27,7 +27,7 @@ export const vendorRoute = router({
       })
     )
     .mutation(async ({ input }) => {
-      return await prisma.vendor.create({
+      return await prisma.seller.create({
         data: input,
       });
     }),
@@ -43,7 +43,7 @@ export const vendorRoute = router({
     )
     .mutation(async ({ input }) => {
       const { id, name, email, phone, addresse } = input;
-      return await prisma.vendor.update({
+      return await prisma.seller.update({
         where: {
           id,
         },

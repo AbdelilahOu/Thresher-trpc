@@ -26,7 +26,7 @@ model Client {
   commands Command[]
 }
 
-model Vendor {
+model Seller {
   id       Int       @id @default(autoincrement())
   name     String
   phone    String?
@@ -37,10 +37,10 @@ model Vendor {
 
 model Invoice {
   id           Int           @id @default(autoincrement())
-  vendor       Vendor        @relation(fields: [vendorId], references: [id])
+  seller       Seller        @relation(fields: [sellerId], references: [id])
   total        Float
   createdAt    DateTime      @default(now())
-  vendorId     Int
+  sellerId     Int
   invoiceItems InvoiceItem[]
 }
 
